@@ -1,0 +1,13 @@
+venv__fastapi_gcp_pro/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.env
+.git
+.gitignore
+.pytest_cache/
+.coverage
+htmlcov/ 
+notes.md
