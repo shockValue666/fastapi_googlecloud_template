@@ -5,7 +5,8 @@ from fastapi import FastAPI
 from datetime import datetime
 import requests
 from fastapi.middleware.cors import CORSMiddleware
-
+import asyncio
+from fastapi.responses import StreamingResponse
 
 app = FastAPI(title="FastAPI GCP Pro")
 
@@ -53,3 +54,40 @@ async def fetch_weather_today():
         "location": "Sample City"
     }
     return mock_weather 
+
+
+
+@app.get("/progress")
+async def progress():
+    """
+    Endpoint that streams progress updates to the client every 10 seconds.
+    """
+    async def progress_stream():
+        for i in range(1, 11):  # 10 updates (every 10 seconds for 100 seconds total)
+            progress = i * 10  # Percentage progress
+            yield f"data: Progress: {progress}%\n\n"  # SSE format
+            await asyncio.sleep(10)  # Wait for 10 seconds
+        yield "data: Progress: 100% - done\n\n"
+
+    return StreamingResponse(progress_stream(), media_type="text/event-stream")
+
+
+
+
+# use ngrok to expose the local server to the internet
+@app.post("/register_webhook")
+async def register_webhook(webhook_url: str):
+    """
+    Register a webhook URL to send updates.
+    Args:
+        webhook_url (str): The URL to call back when the task is done.
+    """
+    # Simulate a long task
+    async def simulate_task():
+        await asyncio.sleep(100)  # Simulate task duration (100 seconds)
+        # Send callback to webhook
+        response = requests.post(webhook_url, json={"status": "done", "message": "Task completed!"})
+        print(f"Webhook sent. Status code: {response.status_code}")
+
+    asyncio.create_task(simulate_task())  # Run task in background
+    return {"message": "Webhook registered. You will be notified when the task is complete."}

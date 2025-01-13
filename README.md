@@ -57,3 +57,65 @@ or to match it with the docker file
 ```
 
 
+# Deploy to Google Cloud Platform
+
+1. install the gcloud cli
+```
+brew install google-cloud-sdk
+```
+
+2. authenticate with GCP
+```
+# Login to google account
+gcloud auth login
+```
+
+3. initialize the project in gcp
+    - go to https://console.cloud.google.com/
+    - top left > new project 
+    - sidebar > cloud run
+    - MY_PROJECT_ID is the name of the project we created in the second bullet
+
+```
+# set the project id
+gcloud config set project MY_PROJECT_ID
+```
+
+4. Enable required APIs
+```
+# enable cloud run api
+gcloud services enable run.googleapis.com
+
+# enable container registry api
+gcloud services enable containerregistry.googleapis.com
+```
+
+5. Build and push the docker image to Google Container Registry
+```
+# set the project id in a variable
+export PROJECT_ID=$(gcloud config get-value project)
+
+# Build the container image
+gcloud builds submit --tag gcr.io/$PROJECT_ID/fastapi-gcp-nextjs
+
+# Alternative methods
+docker build -t gcr.io/$PROJECT_ID/fastapi-gcp-nextjs .
+docker push gcr.io/$PROJECT_ID/fastapi-gcp-nextjs
+```
+
+6. Deploy to Cloud Run
+```
+gcloud run deploy fastapi-gcp-nextjs \
+    --image gcr.io/$PROJECT_ID/fastapi-gcp-nextjs \
+    --platform managed \
+    --region us-central1 \
+    --allow-unauthenticated
+```
+
+7. Connect to github so that it redeploy on push
+    - push the code to github
+    - go to the cloud run instance
+    - navbar > Connect Repo > SET UP WITH CLOUD BUILD > 2.Build configuration: /Dockerfile
+    - create (bottom of the page)
+
+
