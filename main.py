@@ -101,6 +101,10 @@ class DescriptionOfPdf(BaseModel):
     document_type: str = Field(description="Type of document (research paper, report, etc.)")
 
 
+
+# TODO: tomorrow 1. add auth, 2. embed the initially chunked docs from the pypdfloader
+# 3. update the description in the filesUploaded table 4. for the description fetch docs
+# from both the semantic chunking and the initial chunking and then extract the description
 @app.post("/analyze_pdf_with_semantic_chunking")
 async def analyze_pdf_with_semantic_chunking(request: PDFAnalysis):
     """
@@ -207,6 +211,9 @@ async def analyze_pdf_with_semantic_chunking(request: PDFAnalysis):
     return StreamingResponse(chunk_embed_and_save(), media_type="text/event-stream")
 
 
+@app.get("/download_pdf")
+async def download_pdf():
+    return {"message": "Download PDF endpoint"}
 
 # use ngrok to expose the local server to the internet
 @app.post("/register_webhook")

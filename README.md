@@ -119,3 +119,26 @@ gcloud run deploy fastapi-gcp-nextjs \
     - create (bottom of the page)
 
 
+
+
+# Directions for testing and developing 
+
+1. first deploy the docker image locally 
+```
+gcloud builds submit --tag gcr.io/$PROJECT_ID/fastapi-gcp-nextjs
+```
+
+2. then in order to deploy with env variables
+    a. 
+    ```
+    gcloud run deploy fastapi-gcp-nextjs \
+        --image gcr.io/$PROJECT_ID/fastapi-gcp-nextjs \
+        --set-env-vars "KEY1=value1,KEY2=value2"
+    ```
+    b. 
+        - go to google cloud service
+        - click "Edit & Deploy New Revision" 
+        - under "Variables & Secrets" tab, add the env variables
+
+# Automatic deployment from github (since i can't pass the env variables directly to the gcloud)
+    1. crate cloudbuild.yaml
